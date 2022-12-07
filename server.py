@@ -82,7 +82,7 @@ def server():
                     serversocket.close()
                     print("Server closed")
                     sys.exit()
-            
+
 if __name__ == "__main__":
     get_infos()
     server()
