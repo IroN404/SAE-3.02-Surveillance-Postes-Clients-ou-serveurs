@@ -4,6 +4,7 @@ import csv, sys, socket
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from PyQt6.QtCore import *
+import os
 
 # Create the application
 class UI(QWidget):
@@ -30,20 +31,19 @@ class UI(QWidget):
         self.ButtonReset = QPushButton("Reset")   # Create the reset button
         self.ButtonAdd = QPushButton("Add")   # Create the add button
         self.ButtonRemove = QPushButton("Remove")   # Create the remove button
-        self.ServTable = QListView() # Create the server table
+        self.ServerList = QListWidget() # Create the server table
         self.Host = QLineEdit() # Create the host line edit
         self.Port = QLineEdit() # Create the port line edit
         self.Message = QLineEdit()  # Create the message line edit
         self.Response = QTextEdit() # Create the response text edit
 
         # Tableau des serveurs
-        self.layout.addWidget(self.ServTable, 0, 0,2,2) # Add the server table to the layout
+        self.layout.addWidget(self.ServerList, 0, 0,2,2) # Add the server table to the layout
 
         # Manually Enter Host
         self.layout.addWidget(self.Port, 4, 0, 1, 1)   # Add the IP label to the layout
         self.layout.addWidget(self.Host, 3,0,1,1)   # Add the host line edit to the layout
-        self.layout.addWidget(self.ButtonAdd, 3,1,1,1)   # Add the add button to the layout
-        self.layout.addWidget(self.ButtonRemove, 4, 1, 1, 1)    # Add the remove button to the layout
+        self.layout.addWidget(self.ButtonAdd, 3,1,2,1)   # Add the add button to the layout
 
         # Etat de la connexion
         self.layout.addWidget(self.LabelConnexion, 2,0,1,1)  # Add the connexion label to the layout
@@ -62,12 +62,15 @@ class UI(QWidget):
         # Envoi message manuel
         self.layout.addWidget(self.Message, 7, 3, 1, 2) # Add the message line edit to the layout
         # Connexion des boutons
+        self.ButtonAdd.clicked.connect(self.AddServer)    # Connect the add button to the AddServer function
+        self.ButtonConnect.clicked.connect(self.Connect)  # Connect the connect button to the Connect function
+        self.ButtonQuit.clicked.connect(self.Quit)    # Connect the quit button to the Quit function
 
         # Definition des attributs
         self.Response.setReadOnly(True) # Set the response text edit to read only
-        self.ServTable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)    # Set the server table edit triggers to no edit triggers
+        self.ServerList.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)    # Set the server table edit triggers to no edit triggers
         self.LabelConnexionState.setStyleSheet("color: red")    # Set the connexion state label color to red
-        self.ServTable.setFixedWidth(300)   # Set the server table fixed width to 300
+        self.ServerList.setFixedWidth(300)   # Set the server table fixed width to 300
         self.Response.setFixedWidth(400)    # Set the response text edit fixed width to 400
         self.Response.setFixedHeight(440)   # Set the response text edit fixed height to 400
         self.Message.setFixedWidth(400) # Set the message line edit fixed width to 400
@@ -86,9 +89,105 @@ class UI(QWidget):
         self.LabelConnexion.setStyleSheet("margin-left: 60px")  # Set the connexion label margin left to 70px
         self.Host.setFixedWidth(180)    # Set the host line edit fixed width to 150
         self.Port.setFixedWidth(180)    # Set the port line edit fixed width to 150
+        self.CSVToList()    # Call the CSVToList function
         
         # Affichage de la fenetre
         self.show() # Show the window
+        
+    def CSVToList(self):
+        global file
+        self.ServerList.clear()
+        file = True
+        try:
+            with open("./server.csv", "r") as f:
+                reader = csv.reader(f)
+                for column in reader:
+                    ip = column[0].split(";")
+                    port = column[0].split(";")
+                    self.ServerList.addItem("Adresse : " + ip[0] + " Port : " + port[1])
+        except:
+            file=False
+            self.ServerList.addItem("No CSV file found, add a server to create one")
+
+    def AddServer(self):
+        self.CSVToList()
+        if file != False:
+            if self.Host.text() == "" or self.Port.text() == "":
+                self.Response.append("Please enter a valid IP and a valid PORT")
+            else :
+                global flag
+                flag = False
+                if ("." in self.Host.text()):
+                    elements_array = self.Host.text().strip().split(".")
+                    if(len(elements_array) == 4):
+                        for i in elements_array:
+                            if (i.isnumeric() and int(i)>=0 and int(i)<=255):
+                                flag=True
+                            else:
+                                flag=False
+                                break
+                if flag or self.Host.text() == "localhost":
+                    self.Response.append("Server added")
+                    with open("./server.csv", "a") as f:
+                    # Write an new line in the CSV file
+                        # if f is empty, write the first line
+                        if os.stat("./server.csv").st_size == 0:
+                            f.write(self.Host.text() + ";" + self.Port.text())
+                        else:
+                            f.write("\n" + self.Host.text() + ";" + self.Port.text())
+                    self.CSVToList()
+                else:
+                    self.Response.append("Please enter a valid IP and a valid PORT")
+        else:
+            if self.Host.text() == "" or self.Port.text() == "":
+                self.Response.append("Please enter a valid IP and a valid PORT")
+            else :
+                flag = False
+                if ("." in self.Host.text()):
+                    elements_array = self.Host.text().strip().split(".")
+                    if(len(elements_array) == 4):
+                        for i in elements_array:
+                            if (i.isnumeric() and int(i)>=0 and int(i)<=255):
+                                flag=True
+                            else:
+                                flag=False
+                                break
+                if flag or self.Host.text() == "localhost":
+                    self.Response.append("Server added")
+                    with open("./server.csv", "w") as f:
+                    # Write an new line in the CSV file
+                        # if f is empty, write the first line
+                        if os.stat("./server.csv").st_size == 0:
+                            f.write(self.Host.text() + ";" + self.Port.text())
+                        else:
+                            f.write("\n" + self.Host.text() + ";" + self.Port.text())
+                    self.CSVToList()
+                else:
+                    self.Response.append("Please enter a valid IP and a valid PORT")
+
+    def Connect(self):
+        if self.Host.text() == "" or self.Port.text() == "":
+            self.Response.append("Please enter a valid IP and a valid PORT")
+            self.LabelConnexionState.setStyleSheet("color: orange")
+            self.LabelConnexionState.setText("Connection Error")
+        else :
+            try :
+                socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                socket.connect((self.Host.text(), int(self.Port.text())))
+                self.LabelConnexionState.setStyleSheet("color: green")
+                self.LabelConnexionState.setText("Connected")
+                self.Response.append("Connected to " + self.Host.text() + ":" + self.Port.text())
+            except :
+                self.Response.append("Connection failed")
+                self.LabelConnexionState.setStyleSheet("color: orange")
+                self.LabelConnexionState.setText("Connection Error")
+
+
+    def Quit(self):
+        self.close()    # Close the window
+        
+        
+
 
 if __name__ == "__main__":  # If the name is main
     app = QApplication(sys.argv)    # Create the app variable and set it to the application
