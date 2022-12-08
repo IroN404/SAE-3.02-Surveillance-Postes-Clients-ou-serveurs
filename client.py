@@ -65,7 +65,6 @@ class UI(QWidget):
 
         # Definition des attributs
         self.Response.setReadOnly(True) # Set the response text edit to read only
-
         self.ServTable.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)    # Set the server table edit triggers to no edit triggers
         self.LabelConnexionState.setStyleSheet("color: red")    # Set the connexion state label color to red
         self.ServTable.setFixedWidth(300)   # Set the server table fixed width to 300
@@ -87,14 +86,6 @@ class UI(QWidget):
         self.LabelConnexion.setStyleSheet("margin-left: 60px")  # Set the connexion label margin left to 70px
         self.Host.setFixedWidth(180)    # Set the host line edit fixed width to 150
         self.Port.setFixedWidth(180)    # Set the port line edit fixed width to 150
-
-        # center the two connexion state labels
-        '''
-        
-        self.LabelConnexionState.setStyleSheet("margin-left: 70px")   # Set the connexion state label margin left to 10px
-        self.LabelConnexionState.setStyleSheet("margin-right: 70px")  # Set the connexion state label margin right to 10px
-        self.LabelConnexionState.setStyleSheet("color: red")   # Set the connexion state label color to red
-        '''
         
         # Affichage de la fenetre
         self.show() # Show the window
