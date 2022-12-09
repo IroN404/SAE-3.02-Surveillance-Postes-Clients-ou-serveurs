@@ -1,6 +1,6 @@
 <h1 align = "center">
     <br>
-    <img src="https://i.ibb.co/51VMVkd/Sans-titre-2.png" alt="Sans-titre-2" border="0">
+    <img src="https://i.ibb.co/dWvj19V/Sans-titre-3.png" alt="Sans-titre-3" border="0" width="500">
     <br>
     SAE-3.02-Surveillance-Postes-Clients-ou-serveurs
     <br>
