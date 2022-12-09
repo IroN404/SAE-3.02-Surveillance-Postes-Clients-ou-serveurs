@@ -102,7 +102,13 @@ Once connected, you can send a command to the server by entering it in the "Comm
 | ram     | Retrieve the different server RAM usage in percent |
 | hostname| Retrieve the server hostname |
 | ip      | Retrieve the server IP address |
+| python --version | Retrieve the server python version |
+| ping <address> | Ping the server |
 | clear   | Clear the terminal |
+| disconnect | Disconnect from the server |
+| connexion information | Retrieve the server's ip and name |
+| kill   | Kill the server |
+| reset  | Reset the server |
 | exit    | Disconnect from the server |
 
 #### There are commands specific to the os of the server:
@@ -111,11 +117,19 @@ Once connected, you can send a command to the server by entering it in the "Comm
 
 | Command | Description |
 | ------- | ----------- |
-| MS:dir  | Retrieve the list of files and folders in the current directory |
+| DOS:dir  | Retrieve the list of files and folders in the current directory |
+| DOS:mkdir <folder name> | Create a folder in the current directory |
+| DOS:cd <folder name> | Change the current directory |
+| DOS:del <file name> | Delete a file in the current directory |
+| DOS:rd <folder name> | Delete a folder in the current directory |
+| powershell: get-process | Retrieve the list of processes running on the server |
+| powershell: stop-process <process name> | Stop a process running on the server |
 
 ##### For linux:
 
 | Command | Description |
 | ------- | ----------- |
-| LS:dir  | Retrieve the list of files and folders in the current directory |
+| linux: ls | Retrieve the list of files and folders in the current directory |
+| linux: rm <file name> | Delete a file in the current directory |
+| linux: rmdir <folder name> | Delete a folder in the current directory |
 
