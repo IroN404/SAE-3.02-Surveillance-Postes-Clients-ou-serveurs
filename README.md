@@ -17,7 +17,7 @@ https://www.python.org/downloads/
 
 - Install pip
 
-Usually, pip is automatically installed if you are:
+    Usually, pip is automatically installed if you are:
 
     - working in a virtual environment
     - using Python downloaded from python.org
