@@ -1,6 +1,6 @@
 <h1 align = "center">
     <br>
-    <img src="https://i.ibb.co/dWvj19V/Sans-titre-3.png" alt="Sans-titre-3" border="0" width="500">
+    <img src="https://i.ibb.co/dWvj19V/Sans-titre-3.png" alt="Sans-titre-3" border="0" width="300">
     <br>
     SAE-3.02-Surveillance-Postes-Clients-ou-serveurs
     <br>
@@ -8,14 +8,29 @@
 
 <h4 align="center">A Python based GUI app made with PyQt to monitor a server's resources and send commands to it.</h4>
 
+<p align="center">
+  <a href="#key-features">Key Features</a> •
+  <a href="#how-to-use">Requirements</a> •
+  <a href="#download">Installation</a> •
+  <a href="#credits">Server Side Usage</a> •
+  <a href="#related">Client Side Usage</a> •
+  <a href="#license">License</a>
+</p>
+
+## Key Features
+
+* Monitor a server's resources
+* Send commands to the server
+* Save the server's ip and port in a csv file
+* Connect to a server by entering its ip and port
+* Connect to a server by choosing it from a list
+
 ## Requirements
 - Python 3.6
 - pip
 - psutil
-- platform
 - socket
 - threading
-- subprocess
 
 ## Installation
 - Install python 3.x
@@ -47,6 +62,7 @@ pip install -r requirements.txt
 ```bash
 python server.py -p <port>
 ```
+<img margin-left=auto margin-right=auto src="https://i.ibb.co/NYvBhcP/CMD.gif" alt="CMD" border="0">
 
 ### Options
 
