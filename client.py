@@ -178,6 +178,7 @@ class UI(QWidget):
         else :
             try :
                 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                socket.settimeout(2)
                 socket.connect((self.Host.text(), int(self.Port.text())))
                 self.LabelConnexionState.setStyleSheet("color: green")
                 self.LabelConnexionState.setText("Connected")
