@@ -1,3 +1,7 @@
+<h1 align = "center">
+    <br>
+    <img src="https://raw.githubusercontent.com/MaximeGiraudet/SAE-3.02-Surveillance-Postes-Clients-ou-serveurs/master/img/logo.png" alt="Logo" width="200">
+
 # SAE-3.02-Surveillance-Postes-Clients-ou-serveurs
 This is a project to create a surveillance system for the SAE-3.02 course at the University of Colmar.
 
