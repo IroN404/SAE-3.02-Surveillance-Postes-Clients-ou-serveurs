@@ -10,10 +10,10 @@
 
 <p align="center">
   <a href="#key-features">Key Features</a> •
-  <a href="#how-to-use">Requirements</a> •
-  <a href="#download">Installation</a> •
-  <a href="#credits">Server Side Usage</a> •
-  <a href="#related">Client Side Usage</a> •
+  <a href="#Requirements">Requirements</a> •
+  <a href="#Installation">Installation</a> •
+  <a href="#Server Side">Server Side Usage</a> •
+  <a href="#Client Side">Client Side Usage</a> •
   <a href="#license">License</a>
 </p>
 
