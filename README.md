@@ -19,9 +19,9 @@ https://www.python.org/downloads/
 
 Usually, pip is automatically installed if you are:
 
-- - working in a virtual environment
-- - using Python downloaded from python.org
-- - using Python that has not been modified by a redistributor to remove ensurepip
+    - working in a virtual environment
+    - using Python downloaded from python.org
+    - using Python that has not been modified by a redistributor to remove ensurepip
 
 https://pip.pypa.io/en/stable/installing/
 
