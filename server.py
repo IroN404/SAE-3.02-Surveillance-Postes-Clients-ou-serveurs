@@ -3,6 +3,21 @@ import platform
 import psutil
 import sys
 import subprocess
+import signal
+
+def handler(signum, frame):
+    res = input("Do you really want to exit? (y/n) : ")
+    if res == 'y':
+        try :
+            conn.close()
+            serversocket.close()
+            print("Server closed")
+            sys.exit()
+        except:
+            exit(1)
+    else :
+        pass
+
 
 def get_infos():
     # Create a TCP/IP socket in order to grab server's IP address
@@ -19,9 +34,12 @@ def get_infos():
     OperatingSystem = platform.system()
 
 def server():
+    signal.signal(signal.SIGINT, handler)
     msg = ""
+    global conn
     conn = None
     port  = None
+    global serversocket
     serversocket = None
     while msg != 'kill':
         # Create the server's socket

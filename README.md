@@ -56,7 +56,7 @@
 pip install -r requirements.txt
 ```
 
-## Server side
+## Server Side
 
 ### Usage
 ```bash
@@ -72,7 +72,7 @@ python server.py -p <port>
 
 Then the server will be launched and will wait for clients to connect.
 
-## Client side
+## Client Side
 
 ### Usage
 ```bash
@@ -110,4 +110,10 @@ Once connected, you can send a command to the server by entering it in the "Comm
 | Command | Description |
 | ------- | ----------- |
 | MS:dir  | Retrieve the list of files and folders in the current directory |
+
+##### For linux:
+
+| Command | Description |
+| ------- | ----------- |
+| LS:dir  | Retrieve the list of files and folders in the current directory |
 
