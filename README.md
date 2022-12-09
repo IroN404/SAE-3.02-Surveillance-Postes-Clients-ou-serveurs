@@ -61,3 +61,7 @@ python client.py
 | -h     | Show help |
 | -p     | Port to use |
 | -s     | Server IP address |
+
+## Authors
+
+- [**Grégory Maitre**](

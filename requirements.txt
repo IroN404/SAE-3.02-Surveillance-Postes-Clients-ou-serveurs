@@ -1,1 +1,2 @@
-psutil, PyQt6
+psutil
+PyQt6
