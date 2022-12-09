@@ -88,7 +88,7 @@ After that, you can choose a server in  the list then click on the "Connect" but
 You can also manually enter the server's ip and port in the corresponding fields and click on the "Connect" button.
 After entering the server's ip and port, you can click on the "Add" button to add the server to the list.
 
-<a href="https://ibb.co/ZSbBy0M"><img src="https://i.ibb.co/YXVcvxL/man-connect.gif" alt="man-connect" border="0"></a>
+<a href="https://ibb.co/0h0hMnQ"><img src="https://i.ibb.co/NZ0ZjF7/Dec-09-2022-15-50-13.gif" alt="Dec-09-2022-15-50-13" border="0"></a>
 
 Once connected, you can send a command to the server by entering it in the "Command" field and pressing enter key.
 
