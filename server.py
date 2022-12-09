@@ -2,8 +2,6 @@ import socket
 import platform
 import psutil
 import sys
-import os
-import random
 import subprocess
 
 def get_infos():

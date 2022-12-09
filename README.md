@@ -1,10 +1,7 @@
 # SAE-3.02-Surveillance-Postes-Clients-ou-serveurs
 This is a project to create a surveillance system for the SAE-3.02 course at the University of Colmar.
 
-## Server side
-The server side is a python script that will run on a server. It will be used to send the data to the client side.
-
-### Requirements
+## Requirements
 - Python 3.6
 - pip
 - psutil
@@ -13,7 +10,7 @@ The server side is a python script that will run on a server. It will be used to
 - threading
 - subprocess
 
-### Installation
+## Installation
 - Install python 3.6
 
 - Install pip
@@ -23,9 +20,30 @@ The server side is a python script that will run on a server. It will be used to
 pip install -r requirements.txt
 ```
 
-- Run the server
+## Server side
+
+### Usage
 ```bash
 python server.py -p <port>
 ```
 
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| -p     | Port to use |
+
 ## Client side
+
+### Usage
+```bash
+python client.py
+```
+
+### Options
+
+| Option | Description |
+| ------ | ----------- |
+| -h     | Show help |
+| -p     | Port to use |
+| -s     | Server IP address |
