@@ -10,7 +10,7 @@ def get_infos():
     # Create a TCP/IP socket in order to grab server's IP address
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.connect(("8.8.8.8", 80))
-    global IP
+    global IPadress
     IP = sock.getsockname()[0]
     sock.close()
     # Get the server's hostname
