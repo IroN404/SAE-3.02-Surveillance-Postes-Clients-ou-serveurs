@@ -145,8 +145,8 @@ class UI(QWidget):
                 flag = False
                 if ("." in self.Host.text()):
                     elements_array = self.Host.text().strip().split(".")
-                    if(len(elements_array) == 4):
-                        for i in elements_array:
+                    if(len(elements_array) == 4) :
+                        for i in elements_array :
                             if (i.isnumeric() and int(i)>=0 and int(i)<=255):
                                 flag=True
                             else:
@@ -166,6 +166,11 @@ class UI(QWidget):
                     self.Response.append("Please enter a valid IP and a valid PORT")
 
     def Connect(self):
+        global socket
+        global host
+        global port
+        host = self.Host.text()
+        port = self.Port.text()
         if self.Host.text() == "" or self.Port.text() == "":
             self.Response.append("Please enter a valid IP and a valid PORT")
             self.LabelConnexionState.setStyleSheet("color: orange")
