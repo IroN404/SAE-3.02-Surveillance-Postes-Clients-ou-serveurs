@@ -13,6 +13,8 @@ This is a project to create a surveillance system for the SAE-3.02 course at the
 ## Installation
 - Install python 3.6
 
+https://www.python.org/downloads/
+
 - Install pip
 
 - Install the requirements
