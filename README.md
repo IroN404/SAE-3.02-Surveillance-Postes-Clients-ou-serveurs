@@ -67,7 +67,7 @@ After entering the server's ip and port, you can click on the "Add" button to ad
 
 Once connected, you can send a command to the server by entering it in the "Command" field and pressing enter key.
 
-Here is a list of the  predifined commands that can be sent to the server:
+#### Here is a list of the  predifined commands that can be sent to the server:
 
 | Command | Description |
 | ------- | ----------- |
@@ -80,9 +80,9 @@ Here is a list of the  predifined commands that can be sent to the server:
 | clear   | Clear the terminal |
 | exit    | Disconnect from the server |
 
-There are commands specific to the os of the server:
+#### There are commands specific to the os of the server:
 
-For windows:
+##### For windows:
 
 | Command | Description |
 | ------- | ----------- |
