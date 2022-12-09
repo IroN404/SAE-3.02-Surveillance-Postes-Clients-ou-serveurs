@@ -11,9 +11,9 @@ This is a project to create a surveillance system for the SAE-3.02 course at the
 - subprocess
 
 ## Installation
-- Install python 3.6
+- Install python 3.x
 
-https://www.python.org/downloads/
+    You can download it from [python.org](https://www.python.org/downloads/)
 
 - Install pip
 
@@ -23,7 +23,11 @@ https://www.python.org/downloads/
     - using Python downloaded from python.org
     - using Python that has not been modified by a redistributor to remove ensurepip
 
-https://pip.pypa.io/en/stable/installing/
+    If pip is not installed, you can install it by running the following command:
+
+    ```bash
+    python get-pip.py
+    ```
 
 - Install the requirements
 ```bash
