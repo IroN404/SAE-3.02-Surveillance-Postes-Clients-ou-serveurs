@@ -6,8 +6,7 @@
     <br>
 </h1>
 
-# SAE-3.02-Surveillance-Postes-Clients-ou-serveurs
-This is a project to create a surveillance system for the SAE-3.02 course at the University of Colmar.
+<h4 align="center">A Python based GUI app made with PyQt to monitor a server's resources and send commands to it.</h4>
 
 ## Requirements
 - Python 3.6
