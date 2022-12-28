@@ -5,6 +5,8 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from PyQt6.QtCore import *
 import os
+import threading
+import time
 
 # Create the application
 class UI(QWidget):
@@ -14,106 +16,146 @@ class UI(QWidget):
         self.setWindowTitle("Surveillance poste client")    # Set the title
         self.setFixedWidth(750) # Set the width of the window
         self.setFixedHeight(500)    # Set the height of the window
-        self.layout = QGridLayout() # Create the layout
-        self.setLayout(self.layout) # Set the layout
-
-        # Create the widgets
-        self.LabelHost = QLabel("Server's IP")   # Create the IP label
-        self.LabelPort = QLabel("Server's Port") # Create the PORT label
-        self.LabelConnexion = QLabel("Connection State : ")   # Create the connexion label
-        self.LabelConnexionState = QLabel("Not Connected")   # Create the connexion state label
-        self.ButtonConnect = QPushButton("Connect") # Create the connect button
-        self.ButtonDisconnect = QPushButton("Disconnect")   # Create the disconnect button
-        self.ButtonClear = QPushButton("Clear")  # Create the clear button
-        self.ButtonKill = QPushButton("Kill")   # Create the kill button
-        self.ButtonQuit = QPushButton("Quit")   # Create the quit button
-        self.ButtonSend = QPushButton("Send")   # Create the send button
-        self.ButtonReset = QPushButton("Reset")   # Create the reset button
-        self.ButtonAdd = QPushButton("Add")   # Create the add button
-        self.ButtonRemove = QPushButton("Remove")   # Create the remove button
+        self.setStyleSheet("background-color: #131313")    # Set the background color
+        # Create the differnt parts of the window
+        self.MainFrame = QHBoxLayout() # Create the layout
+        self.LeftBar = QVBoxLayout()    # Create the left bar
+        self.LeftBarTop = QVBoxLayout() # Create the top part of the left bar
+        self.LeftBarBottom = QVBoxLayout()  # Create the bottom part of the left bar
+        self.RightBar = QVBoxLayout()   # Create the right bar
+        # Create the differnt parts of the left bar
         self.ServerList = QListWidget() # Create the server table
-        self.Host = QLineEdit() # Create the host line edit
-        self.Port = QLineEdit() # Create the port line edit
-        self.Command = QLineEdit()  # Create the message line edit
-        self.Response = QTextEdit() # Create the response text edit
+        self.Response = QTextEdit()   # Create the label
+        self.ChooseFile = QPushButton("Choose a file") # Create the button
+        self.Host = QLineEdit()  # Create the input
+        self.Port = QLineEdit()  # Create the input
+        self.AddButton = QPushButton("Add a server") # Create the button
+        self.Command = QLineEdit()   # Create the input
+        self.ConnectionState = QLabel("Not Connected") # Create the label
+        self.EmptyTextBox = QLabel("Server List")
+        global secondlabel
+        self.secondlabel = QLabel("Please choose a CSV file with the\nbutton above or start adding a server\nmanually to create a local CSV file")
+        # Define Host attributes
+        self.Host.setPlaceholderText("Host")
+        self.Host.setStyleSheet("background-color: #000; color: #FFF;")
+        self.Host.setFixedWidth(225)
+        self.Host.setFixedHeight(30)
+        # Define Port attributes
+        self.Port.setPlaceholderText("Port")
+        self.Port.setStyleSheet("background-color: #000; color: #FFF;")
+        self.Port.setFixedWidth(225)
+        self.Port.setFixedHeight(30)
+        # Define Response attributes
+        self.Response.setReadOnly(True)
+        self.Response.setPlaceholderText("Server's reply will be displayed here")
+        # Define AddButton attributes
+        self.AddButton.setStyleSheet("background-color: #000; color: #FFF;:active {background-color: #000; color: #FFF;};")
+        # Define ConnectionState attributes
+        self.ConnectionState.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.ConnectionState.setStyleSheet("color: #FFF;padding: 20,0,0,0;color: red;")
+        self.ConnectionState.setFixedHeight(30)
+        # Define ChooseFile attributes
+        self.ChooseFile.setStyleSheet("background-color: #000; color: #FFF;padding: 0,0,0,20;border-top : 1px solid #FFF;:active {background-color: #000; color: #FFF;};")
+        self.ChooseFile.setFixedWidth(250)
+        self.ChooseFile.setFixedHeight(30)
+        # Define ServerList attributes
+        self.ServerList.setStyleSheet(" background-color: #000; color: #FFF;")
+        # Define Respone attributes
+        self.Response.setStyleSheet("background-color: #000; color: #FFF;")
+        self.Response.setFixedWidth(500)
+        # Define Command attributes
+        self.Command.setStyleSheet("background-color: #000; color: #FFF;border-top : 1px solid #FFF;")
+        self.Command.setPlaceholderText("Insert a command here : ")
+        self.Command.setFixedHeight(30)
+        self.Command.setFixedWidth(500)
+        # Define EmptyTextBox attributes
+        self.EmptyTextBox.setFixedHeight(50)
+        self.EmptyTextBox.setStyleSheet("background-color: #000; color: #FFF;border-bottom : 1px solid #FFF;")
+        self.EmptyTextBox.setFont(QFont("Arial", 20))
+        self.EmptyTextBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # Define secondlabel attributes
+        self.secondlabel.setStyleSheet("background-color: #000; color: #FFF;padding: 20,20,0,0;")
+        self.secondlabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.secondlabel.setFont(QFont("Arial", 14))
+        # Server list 
+        self.LeftBar.addLayout(self.LeftBarTop) # Add the top part of the left bar to the left bar
+        self.LeftBar.addLayout(self.LeftBarBottom)   # Add the bottom part of the left bar to the left bar
+        self.LeftBarTop.addWidget(self.EmptyTextBox)
+        self.LeftBarTop.addWidget(self.secondlabel)
+        self.LeftBarTop.addWidget(self.ServerList)
+        self.LeftBarTop.addWidget(self.ChooseFile)
+        self.LeftBarTop.setContentsMargins(0, 0, 0, 20)
+        # Server adding side
+        self.LeftBarBottom.addWidget(self.Host)
+        self.LeftBarBottom.addWidget(self.Port)
+        self.LeftBarBottom.addWidget(self.AddButton)
+        self.LeftBarBottom.addWidget(self.ConnectionState)
+        self.LeftBarBottom.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.LeftBarBottom.setSpacing(10)
+        # Left Side
+        self.LeftBar.setContentsMargins(0, 0, 0, 20)
+        self.LeftBar.setSpacing(0)
+        # Right Side
+        self.RightBar.addWidget(self.Response)
+        self.RightBar.addWidget(self.Command)
+        self.RightBar.setContentsMargins(0, 0, 0, 0)
+        self.RightBar.setSpacing(0)
+        # Main Frame
+        self.MainFrame.setContentsMargins(0, 0, 0, 0)
+        self.MainFrame.addLayout(self.LeftBar)
+        self.MainFrame.addLayout(self.RightBar)
+        self.setLayout(self.MainFrame)
+        # Define the actions
+        self.ChooseFile.clicked.connect(lambda: self.getfile())
+        self.AddButton.clicked.connect(lambda: self.AddServer())
+        self.Command.returnPressed.connect(lambda: self.Send())
+        self.ServerList.itemDoubleClicked.connect(lambda: self.connect())
+        self.file = None
+        # Display the window
+        self.show()
 
-        # Tableau des serveurs
-        self.layout.addWidget(self.ServerList, 0, 0,2,2) # Add the server table to the layout
 
-        # Manually Enter Host
-        self.layout.addWidget(self.Port, 4, 0, 1, 1)   # Add the IP label to the layout
-        self.layout.addWidget(self.Host, 3,0,1,1)   # Add the host line edit to the layout
-        self.layout.addWidget(self.ButtonAdd, 3,1,2,1)   # Add the add button to the layout
-
-        # Etat de la connexion
-        self.layout.addWidget(self.LabelConnexion, 2,0,1,1)  # Add the connexion label to the layout
-        self.layout.addWidget(self.LabelConnexionState, 2, 1, 1, 1) # Add the connexion state label to the layout
-
-        # Boutons de connexion
-        self.layout.addWidget(self.ButtonConnect, 5, 0, 1, 2)   # Add the connect button to the layout
-        self.layout.addWidget(self.ButtonDisconnect, 6, 0, 1, 2)    # Add the disconnect button to the layout
-        self.layout.addWidget(self.ButtonQuit, 7, 0, 1, 2)  # Add the quit button to the layout
-        
-        # Fenetres de message
-        self.layout.addWidget(self.Response, 0, 3, 1, 2)    # Add the response text edit to the layout
-
-        # Envoi message manuel
-        self.layout.addWidget(self.Command, 7, 3, 1, 2) # Add the message line edit to the layout
-        # Connexion des boutons
-        self.ButtonAdd.clicked.connect(self.AddServer)    # Connect the add button to the AddServer function
-        self.ButtonConnect.clicked.connect(self.Connect)  # Connect the connect button to the Connect function
-        self.ButtonQuit.clicked.connect(self.Quit)    # Connect the quit button to the Quit function
-        self.ServerList.itemClicked.connect(self.connectCSV)    # Connect the server table to the SelectServer function
-        self.ButtonDisconnect.clicked.connect(self.disconnect)  # Connect the disconnect button to the Disconnect function
-
-        # Definition des attributs
-        self.Response.setReadOnly(True) # Set the response text edit to read only
-        self.ServerList.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)    # Set the server table edit triggers to no edit triggers
-        self.LabelConnexionState.setStyleSheet("color: red")    # Set the connexion state label color to red
-        self.ServerList.setFixedWidth(300)   # Set the server table fixed width to 300
-        self.Response.setFixedWidth(400)    # Set the response text edit fixed width to 400
-        self.Response.setFixedHeight(430)   # Set the response text edit fixed height to 400
-        self.Command.setFixedWidth(400) # Set the message line edit fixed width to 400
-        self.Command.setPlaceholderText("Enter your command here >")    # Set the message line edit placeholder text
-        self.Command.setFixedHeight(30) # Set the message line edit fixed height to 30
-        self.Command.setStyleSheet("border: 1px solid black")   # Set the message line edit border to 1px solid black
-        self.Response.setStyleSheet("border: 1px solid black")  # Set the response text edit border to 1px solid black  
-        self.Response.setPlaceholderText("Server's reply will be displayed here")    # Set the response text edit placeholder text
-        self.Response.setStyleSheet("background-color: black; color: white")  # Set the response text edit background color to black and the text color to white
-        self.Host.setPlaceholderText("Enter the server's IP here")   # Set the host line edit placeholder text
-        self.Port.setPlaceholderText("Enter the server's PORT here")    # Set the port line edit placeholder text
-        self.Host.setStyleSheet("border: 1px solid black")    # Set the host line edit border to 1px solid black
-        self.Port.setStyleSheet("border: 1px solid black")    # Set the port line edit border to 1px solid black
-        self.Host.setFixedHeight(30)    # Set the host line edit fixed height to 30
-        self.Port.setFixedHeight(30)    # Set the port line edit fixed height to 30
-        self.LabelConnexion.setStyleSheet("margin-left: 60px")  # Set the connexion label margin left to 70px
-        self.Host.setFixedWidth(180)    # Set the host line edit fixed width to 150
-        self.Port.setFixedWidth(180)    # Set the port line edit fixed width to 150
-        # When the user press enter, the message is sent
-        self.Command.returnPressed.connect(self.Send)    # Connect the message line edit return pressed to the SendCommand function
-        self.CSVToList()    # Call the CSVToList function
-        
-        # Affichage de la fenetre
-        self.show() # Show the window
-        
-    def CSVToList(self):
-        global file
-        self.ServerList.clear()
-        file = True
-        try:
-            with open("./server.csv", "r") as f:
+    def CSVupdate(self):
+        if self.file == "choosen":
+            self.ServerList.clear()
+            with open(ServerFileList[0], "r") as f:
                 reader = csv.reader(f)
                 for column in reader:
                     ip = column[0].split(";")
                     port = column[0].split(";")
                     self.ServerList.addItem("Address : " + ip[0] + " Port : " + port[1])
-        except:
-            file=False
-            self.ServerList.addItem("No CSV file found, add a server to create one")
+                    self.secondlabel.setText("Choose a server from the list above")
+                    self.file = True
+        elif self.file == "local":
+            self.ServerList.clear()
+            with open("SAE 3.02/ServerList.csv", "r") as f:
+                reader = csv.reader(f)
+                for column in reader:
+                    ip = column[0].split(";")
+                    port = column[0].split(";")
+                    self.ServerList.addItem("Address : " + ip[0] + " Port : " + port[1])
+                    self.secondlabel.setText("Choose a server from the list above")
 
+
+    def getfile(self):
+        global ServerFileList
+        ServerFileList = QFileDialog.getOpenFileName(self, 'Open file', './',"CSV files (*.csv)")
+        self.ServerList.clear()
+        try:
+            with open(ServerFileList[0], "r") as f:
+                reader = csv.reader(f)
+                for column in reader:
+                    ip = column[0].split(";")
+                    port = column[0].split(";")
+                    self.ServerList.addItem("Address : " + ip[0] + " Port : " + port[1])
+                    self.secondlabel.setText("Choose a server from the list above")
+                    self.file = "choosen"
+        except:
+            self.Response.append("Please choose a valid file")
+
+    
     def AddServer(self):
-        self.CSVToList()
-        if file != False:
+        if self.file == "choosen":
             if self.Host.text() == "" or self.Port.text() == "":
                 self.Response.append("Please enter a valid IP and a valid PORT")
             elif self.Port.text().isdigit() == False:
@@ -121,16 +163,17 @@ class UI(QWidget):
             elif int(self.Port.text()) > 65535:
                 self.Response.append("Port must be between 0 and 65535")
             else :
-                self.Response.append("Server added")
-                with open("./server.csv", "a") as f:
+                self.Response.append("Server added to existing file")
+                with open(ServerFileList[0], "a") as f:
                     # Write an new line in the CSV file
                         # if f is empty, write the first line
-                    if os.stat("./server.csv").st_size == 0:
+                    if os.stat(ServerFileList[0]).st_size == 0:
                         f.write(self.Host.text() + ";" + self.Port.text())
                     else:
                         f.write("\n" + self.Host.text() + ";" + self.Port.text())
-                self.CSVToList()
-        else:
+            self.CSVupdate()
+
+        elif self.file == "local":
             if self.Host.text() == "" or self.Port.text() == "" or self.Port.text().isdigit() == False:
                 self.Response.append("Please enter a valid IP and a valid PORT")
             elif self.Port.text().isdigit() == False:
@@ -139,20 +182,47 @@ class UI(QWidget):
                 self.Response.append("Port must be between 0 and 65535")
             else :
                 self.Response.append("Server added")
-                with open("./server.csv", "w") as f:
+                with open("SAE 3.02/ServerList.csv", "a") as f:
                     # Write an new line in the CSV file
                         # if f is empty, write the first line
-                    if os.stat("./server.csv").st_size == 0:
-                        f.write(self.Host.text() + ";" + self.Port.text())
-                    else:
-                        f.write("\n" + self.Host.text() + ";" + self.Port.text())
-                self.CSVToList()
+                        if os.stat("SAE 3.02/ServerList.csv").st_size == 0:
+                            f.write(self.Host.text() + ";" + self.Port.text())
+                        else:
+                            f.write("\n" + self.Host.text() + ";" + self.Port.text())
+            self.CSVupdate()
 
-    def connectCSV(self):
+        else:
+            if self.Host.text() == "" or self.Port.text() == "":
+                self.Response.append("Please enter a valid IP and a valid PORT")
+            elif self.Port.text().isdigit() == False:
+                self.Response.append("Port must be a number")
+            elif int(self.Port.text()) > 65535:
+                self.Response.append("Port must be between 0 and 65535")
+            else :
+                self.Response.append("Server added")
+                with open("SAE 3.02/ServerList.csv", "w") as f:
+                    # Write an new line in the CSV file
+                        # if f is empty, write the first line
+                        if os.stat("SAE 3.02/ServerList.csv").st_size == 0:
+                            f.write(self.Host.text() + ";" + self.Port.text())
+                        else:
+                            f.write("\n" + self.Host.text() + ";" + self.Port.text())
+            self.file = "local"
+            self.CSVupdate()
+
+
+    def connect(self):
+        global ip
+        global port
+        ip = None
+        port = None
+        global client_socket
         # Get the selected item in the list
         selected = self.ServerList.currentItem()
         # If there is a selected item
-        if selected != None:
+        if selected.text().split(" ")[2] == ip and selected.text().split(" ")[5] == port:
+            self.Response.append("You are already connected to this server")
+        elif selected != None:
             # Get the text of the selected item
             text = selected.text()
             # Split the text into an array
@@ -161,59 +231,90 @@ class UI(QWidget):
             ip = array[2]
             port = array[5]
             # Set the IP and the PORT in the line edit
-            self.Host.setText(ip)
-            self.Port.setText(port)
-            # Connect to the server
-            self.Connect()
-
-    def Connect(self):
-        global socket
-        global host
-        global port
-        host = self.Host.text()
-        port = self.Port.text()
-        if self.Host.text() == "" or self.Port.text() == "":
-            self.Response.append("Please enter a valid IP and a valid PORT to connect to")
-            self.LabelConnexionState.setStyleSheet("color: orange")
-            self.LabelConnexionState.setText("Connection Error")
-        elif self.Port.text().isdigit() == False:
-            self.Response.append("Port must be a number")
-            self.LabelConnexionState.setStyleSheet("color: orange")
-            self.LabelConnexionState.setText("Port digit error")
-        elif int(self.Port.text()) > 65535:
-            self.Response.append("Port must be between 0 and 65535")
-            self.LabelConnexionState.setStyleSheet("color: orange")
-            self.LabelConnexionState.setText("Port range error")
-        else :
-            try :
-                socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                socket.settimeout(2)
-                socket.connect((self.Host.text(), int(self.Port.text())))
-                self.LabelConnexionState.setStyleSheet("color: green")
-                self.LabelConnexionState.setText("Connected")
-                self.Response.append("Connected to " + self.Host.text() + ":" + self.Port.text())
-            except :
-                self.Response.append("Connection failed")
-                self.LabelConnexionState.setStyleSheet("color: orange")
-                self.LabelConnexionState.setText("Connection Error")
+            client_socket = socket.socket()
+            client_socket.settimeout(1)
+            if ip == "" or port == "":
+                self.Response.append("Please enter a valid IP and a valid PORT to connect to")
+                self.ConnectionState.setStyleSheet("color: orange")
+                self.ConnectionState.setText("Connection Error")
+            elif port.isdigit() == False:
+                self.Response.append("Port must be a number")
+                self.ConnectionState.setStyleSheet("color: orange")
+                self.ConnectionState.setText("Port digit error")
+            elif int(port) > 65535:
+                self.Response.append("Port must be between 0 and 65535")
+                self.ConnectionState.setStyleSheet("color: orange")
+                self.ConnectionState.setText("Port range error")
+            else :
+                try :
+                        client_socket.connect((ip, int(port)))
+                        self.ConnectionState.setStyleSheet("color: green")
+                        self.ConnectionState.setText("Connected")
+                        self.Response.append("Connected to " + ip + ":" + port)
+                except :
+                    self.Response.append("{0}:{1} is not available".format(ip,port))
+                    self.ConnectionState.setStyleSheet("color: orange")
+                    self.ConnectionState.setText("Connection Error")
     
-    def disconnect(self):
-        try :
-            socket.close()
-            self.LabelConnexionState.setStyleSheet("color: red")
-            self.LabelConnexionState.setText("Disconnected")
-            self.Response.append("Disconnected from " + self.Host.text() + ":" + self.Port.text())
-        except :
-            self.Response.append("Not connected...")
+    def disconnect(self):   # Disconnect function
+        try:    # Try
+            client_socket.send("disconnect".encode())   # Send the disconnect string encoded to the client socket
+            client_socket.close()   # Close the client socket
+            self.ConnectionState.setText("Disconnected")  # Set the connexion state label to "Déconnecté"
+            self.ConnectionState.setStyleSheet("color: red")    # Set the connexion state label color to red
+            self.Response.append("Disconnected from " + ip + ":" + port)   # Append "Déconnecté de " + self.Host.text() + ":" + self.Port.text() to the response text edit
+        except: # Except
+            self.ConnectionState.setText("Not Connected !")  # Set the connexion state label to "Pas Connecté !"
+            self.ConnectionState.setStyleSheet("color: orange") # Set the connexion state label color to orange
 
     def Send(self):
         try :
-            socket.send(self.Command.text().encode())
-            self.Response.append("Sent : " + self.Command.text())
-            self.Command.setText("")
-            self.Response.append("Received : " + socket.recv(1024).decode())
+            if self.Command.text() == "":
+                self.Response.append("Please enter a command")
+            elif self.Command.text() != "":
+                if self.Command.text() == "disconnect" or self.Command.text() == "DISCONNECT":
+                    self.ConnectionState.setStyleSheet("color: red")
+                    self.ConnectionState.setText("Disconnected")
+                    self.Response.append("Disconnected from "+ ip+":"+port)
+                    client_socket.close()
+                    self.Command.clear()
+                elif self.Command.text() == "clear":
+                    self.Response.clear()
+                    self.Command.clear()
+                elif self.Command.text() == "help":
+                    self.Response.append("disconnect : disconnect from the server")
+                    self.Response.append("clear : clear the response")
+                    self.Response.append("help : show the help")
+                    self.Response.append("quit : quit the application")
+                    self.Command.clear()
+                elif self.Command.text() == "kill":
+                    self.Response.append("You killed the server, you monster !")
+                    client_socket.send(self.Command.text().upper().encode())
+                    self.ConnectionState.setStyleSheet("color: red")
+                    self.ConnectionState.setText("Disconnected")
+                    client_socket.close()
+                    self.Command.clear()
+                elif self.Command.text() == "reset":
+                    self.Response.append("You reset the server, didn't liked it like it was ?")
+                    client_socket.send(self.Command.text().upper().encode())
+                    self.Command.clear()
+                else :
+                    client_socket.send(self.Command.text().upper().encode())
+                    reply = client_socket.recv(1024).decode()
+                    self.Response.append(reply)
+                    self.Command.clear()
         except :
-            self.Response.append("Command can't be sent, not connected...")
+            self.Response.append("Not connected to a server")
+
+    def delay(self):
+        time.sleep(1)
+
+    def Receive(self):
+            try:
+                message = client_socket.recv(1024).decode()
+                self.Response.append(message)
+            except:
+                pass
 
 
     def Quit(self):

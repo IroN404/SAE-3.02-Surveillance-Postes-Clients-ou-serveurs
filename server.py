@@ -70,9 +70,6 @@ def server():
                 return print("not enough arguments, use -p followed by the port number")
         if len(sys.argv) > 3:
             return print("Too many arguments")
-            
-        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         # connection error handling
         try :
             serversocket.bind((host, port))
@@ -80,52 +77,60 @@ def server():
             print(str(e))
 
         # Listen for connections
-        serversocket.listen(1)
-        print(f"Server is listening on address : {IPadress}, Port : {port} \nWaiting for connection...")
-        while msg != 'kill' and msg != 'reset':
+        while True:
             msg = ""
+            serversocket.listen(1)
+            print(f"Server is listening on address : {IPadress}, Port : {port} \nWaiting for connection...")
             try :
                 conn, addr = serversocket.accept()
                 print ("Connection from: " + str(addr))
             except ConnectionError:
                 print("Connection error")
                 break
-            else :
-                while msg != 'kill' and msg != 'reset' and msg != 'disconnect':
+            while True :
+                try :
                     msg = conn.recv(1024).decode()
                     if msg == 'CPU':
-                        conn.send(str(psutil.cpu_percent()).encode())
+                        conn.send(f"[{hostname}] \n{psutil.cpu_percent()} \n".encode())
                     elif msg == 'RAM':
-                        conn.send(str(psutil.virtual_memory().percent).encode())
+                        conn.send(f"[{hostname}] \n{psutil.virtual_memory().percent} \n".encode())
                     elif msg == 'IP':
-                        conn.send(IPadress.encode())
+                        conn.send(f"[{hostname}] \n{IPadress} \n".encode())
                     elif msg == 'hostname':
-                        conn.send(hostname.encode())
+                        conn.send(f"[{hostname}]\n{hostname} \n".encode())
                     elif msg == 'OS':
-                        conn.send(OperatingSystem.encode())
+                        conn.send(f"[{hostname}] \n{OperatingSystem} \n".encode())
+                    elif msg == 'DISCONNECT':
+                        conn.close()
+                        print("Connection closed")
+                        break
+                    elif msg == 'RESET':
+                        # disconnect and reconnect to the client
+                        conn.close()
+                        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+                        serversocket.bind((host, port))
+                        print("Connection closed")
+                    elif msg == 'KILL':
+                        conn.close()
+                        print("Connection closed")
+                        serversocket.close()
+                        print("Server closed")
+                        sys.exit()
                     else :
-                        reply = subprocess.Popen(msg,stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850',shell=True)
-                        try :
-                            conn.sendf(reply.stdout.read().encode())
+                        try:
+                            reply = subprocess.Popen(msg,stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850',shell=True)
+                            try :
+                                conn.send(f"[{hostname}] \n{reply.stdout.read()}".encode())
+                            except:
+                                conn.send(f"[{hostname}] \n{reply.stderr.read()}".encode())
                         except:
-                            conn.send(reply.stderr.read().encode())
-                            
-                if msg == 'disconnect':
-                    conn.close()
+                            conn.send("Command not found".encode())
+                    print (msg)
+                except ConnectionResetError:
                     print("Connection closed")
                     break
-                elif msg == 'reset':
-                    conn.close()
-                    print("Connection closed")
-                    break
-                elif msg == 'kill':
-                    conn.close()
-                    print("Connection closed")
-                    serversocket.close()
-                    print("Server closed")
-                    sys.exit()
 
 if __name__ == "__main__":
     get_infos()
     server()
-
