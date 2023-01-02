@@ -1,9 +1,4 @@
-import socket
-import platform
-import psutil
-import sys
-import subprocess
-import signal
+import socket, platform, psutil, sys, subprocess, signal, time
 
 def handler(signum, frame):
     res = input("Do you really want to exit? (y/n) : ")
@@ -17,7 +12,6 @@ def handler(signum, frame):
             exit(1)
     else :
         pass
-
 
 def get_infos():
     # Create a TCP/IP socket in order to grab server's IP address
@@ -91,15 +85,15 @@ def server():
                 try :
                     msg = conn.recv(1024).decode()
                     if msg == 'CPU':
-                        conn.send(f"[{hostname}] \n{psutil.cpu_percent()} \n".encode())
+                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{psutil.cpu_percent()} \n".encode())
                     elif msg == 'RAM':
-                        conn.send(f"[{hostname}] \n{psutil.virtual_memory().percent} \n".encode())
+                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{psutil.virtual_memory()[2]} \n".encode())
                     elif msg == 'IP':
                         conn.send(f"[{hostname}] \n{IPadress} \n".encode())
                     elif msg == 'hostname':
-                        conn.send(f"[{hostname}]\n{hostname} \n".encode())
+                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{hostname} \n".encode())
                     elif msg == 'OS':
-                        conn.send(f"[{hostname}] \n{OperatingSystem} \n".encode())
+                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{OperatingSystem} \n".encode())
                     elif msg == 'DISCONNECT':
                         conn.close()
                         print("Connection closed")
@@ -120,10 +114,7 @@ def server():
                     else :
                         try:
                             reply = subprocess.Popen(msg,stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850',shell=True)
-                            try :
-                                conn.send(f"[{hostname}] \n{reply.stdout.read()}".encode())
-                            except:
-                                conn.send(f"[{hostname}] \n{reply.stderr.read()}".encode())
+                            conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{reply.stdout.read()}".encode())
                         except:
                             conn.send("Command not found".encode())
                     print (msg)

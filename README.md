@@ -81,16 +81,18 @@ python client.py
 
 ### In application usage
 
-once the client is launched, you can choose a csv file to use to display server information.
+once the client is launched, you can choose a csv file to use to display server information with the "Choose a file" button.
+If you don't have a CSV file or want to create a new one, you can directly add a new server by entering its ip and port in the corresponding fields and clicking on the "Add" button. It will automatically create a new CSV file called "servers.csv" in the actual directory and add the server to it.
 
-After that, you can choose a server in  the list then click on the "Connect" button
+After that, you can choose a server to connect to in the list, and connect to it by double-clicking it in the list.
 
-You can also manually enter the server's ip and port in the corresponding fields and click on the "Connect" button.
-After entering the server's ip and port, you can click on the "Add" button to add the server to the list.
+You can add a server to the list by enterings the correpondings information in the fields above the list, then you can click on the "Add" button to add the new server to the list.
 
-<a href="https://ibb.co/0h0hMnQ"><img src="https://i.ibb.co/NZ0ZjF7/Dec-09-2022-15-50-13.gif" alt="Dec-09-2022-15-50-13" border="0"></a>
+<a href="https://ibb.co/9wX3ZVT"><img src="https://i.ibb.co/vs5vXQP/Capture-d-cran-2022-12-30-13-42-59.png" alt="Capture-d-cran-2022-12-30-13-42-59" border="0" width="200" height="400"></a>
 
 Once connected, you can send a command to the server by entering it in the "Command" field and pressing enter key.
+
+<a href="https://ibb.co/QP9HVQX"><img src="https://i.ibb.co/F56Y13n/Capture-d-cran-2022-12-30-13-51-16.png" alt="Capture-d-cran-2022-12-30-13-51-16" border="0" width="400" hieght="700"></a>
 
 #### Here is a list of the  predifined commands that can be sent to the server:
 

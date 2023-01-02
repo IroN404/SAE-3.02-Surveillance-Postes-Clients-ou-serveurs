@@ -49,13 +49,13 @@ class UI(QWidget):
         self.Response.setReadOnly(True)
         self.Response.setPlaceholderText("Server's reply will be displayed here")
         # Define AddButton attributes
-        self.AddButton.setStyleSheet("background-color: #000; color: #FFF;:active {background-color: #000; color: #FFF;};")
+        self.AddButton.setStyleSheet("background-color: #000; color: #FFF;")
         # Define ConnectionState attributes
         self.ConnectionState.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.ConnectionState.setStyleSheet("color: #FFF;padding: 20,0,0,0;color: red;")
         self.ConnectionState.setFixedHeight(30)
         # Define ChooseFile attributes
-        self.ChooseFile.setStyleSheet("background-color: #000; color: #FFF;padding: 0,0,0,20;border-top : 1px solid #FFF;:active {background-color: #000; color: #FFF;};")
+        #self.ChooseFile.setStyleSheet("background-color: #000; color: #FFF;padding: 0,0,0,20;border-top : 1px solid #FFF;")
         self.ChooseFile.setFixedWidth(250)
         self.ChooseFile.setFixedHeight(30)
         # Define ServerList attributes
@@ -111,9 +111,19 @@ class UI(QWidget):
         self.Command.returnPressed.connect(lambda: self.Send())
         self.ServerList.itemDoubleClicked.connect(lambda: self.connect())
         self.file = None
+        self.rec = threading.Thread(target=self.Receive)
+        self.rec.start() # Start the receive thread
         # Display the window
         self.show()
 
+    def Receive(self):
+        # wait for the server to send a message
+        while True:
+            try:
+                self.Response.append(client_socket.recv(1024).decode())
+            except:
+                pass
+            
 
     def CSVupdate(self):
         if self.file == "choosen":
@@ -135,7 +145,6 @@ class UI(QWidget):
                     port = column[0].split(";")
                     self.ServerList.addItem("Address : " + ip[0] + " Port : " + port[1])
                     self.secondlabel.setText("Choose a server from the list above")
-
 
     def getfile(self):
         global ServerFileList
@@ -210,51 +219,31 @@ class UI(QWidget):
             self.file = "local"
             self.CSVupdate()
 
-
     def connect(self):
         global ip
         global port
+        global client_socket
         ip = None
         port = None
-        global client_socket
-        # Get the selected item in the list
+        client_socket = None
+        socket.setdefaulttimeout(0.25) # Set the socket timeout to 0.25 second
         selected = self.ServerList.currentItem()
-        # If there is a selected item
-        if selected.text().split(" ")[2] == ip and selected.text().split(" ")[5] == port:
-            self.Response.append("You are already connected to this server")
-        elif selected != None:
-            # Get the text of the selected item
-            text = selected.text()
-            # Split the text into an array
-            array = text.split(" ")
-            # Get the IP and the PORT
-            ip = array[2]
-            port = array[5]
-            # Set the IP and the PORT in the line edit
-            client_socket = socket.socket()
-            client_socket.settimeout(1)
-            if ip == "" or port == "":
-                self.Response.append("Please enter a valid IP and a valid PORT to connect to")
-                self.ConnectionState.setStyleSheet("color: orange")
-                self.ConnectionState.setText("Connection Error")
-            elif port.isdigit() == False:
-                self.Response.append("Port must be a number")
-                self.ConnectionState.setStyleSheet("color: orange")
-                self.ConnectionState.setText("Port digit error")
-            elif int(port) > 65535:
-                self.Response.append("Port must be between 0 and 65535")
-                self.ConnectionState.setStyleSheet("color: orange")
-                self.ConnectionState.setText("Port range error")
-            else :
-                try :
-                        client_socket.connect((ip, int(port)))
-                        self.ConnectionState.setStyleSheet("color: green")
-                        self.ConnectionState.setText("Connected")
-                        self.Response.append("Connected to " + ip + ":" + port)
-                except :
-                    self.Response.append("{0}:{1} is not available".format(ip,port))
-                    self.ConnectionState.setStyleSheet("color: orange")
-                    self.ConnectionState.setText("Connection Error")
+        if selected != None:
+            ip = selected.text().split(" ")[2]
+            port = selected.text().split(" ")[5]
+            try :
+                client_socket = socket.socket() # Create a socket
+                client_socket.connect((ip, int(port))) # Connect to the server
+                self.ConnectionState.setText("Connected") # Set the connexion state label to "Connecté"
+                self.ConnectionState.setStyleSheet("color: green") # Set the connexion state label color to green
+                self.Response.append("Connected to " + ip + ":" + port) # Append "Connecté à " + self.Host.text() + ":" + self.Port.text() to the response text edit
+            except:
+                self.ConnectionState.setText("Not Connected !")
+                self.ConnectionState.setStyleSheet("color: red")
+                self.Response.append(ip + ":" + port + " is not responding")
+                self.Response.append("Connection failed")
+        else:
+            self.Response.append("Please choose a server")
     
     def disconnect(self):   # Disconnect function
         try:    # Try
@@ -300,27 +289,15 @@ class UI(QWidget):
                     self.Command.clear()
                 else :
                     client_socket.send(self.Command.text().upper().encode())
-                    reply = client_socket.recv(1024).decode()
-                    self.Response.append(reply)
                     self.Command.clear()
         except :
             self.Response.append("Not connected to a server")
-
-    def delay(self):
-        time.sleep(1)
-
-    def Receive(self):
-            try:
-                message = client_socket.recv(1024).decode()
-                self.Response.append(message)
-            except:
-                pass
-
 
     def Quit(self):
         try :
             socket.close()
             self.close()
+            self.rec.stop()
         except :
             self.close()    # Close the window
         
