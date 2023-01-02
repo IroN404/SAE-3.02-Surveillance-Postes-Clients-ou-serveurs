@@ -1,7 +1,7 @@
 import socket, platform, psutil, sys, subprocess, signal, time
 
 def handler(signum, frame):
-    res = input("Do you really want to exit? (y/n) : ")
+    res = input("Are you sure you want to exit ? (y/n) : ")
     if res == 'y':
         try :
             conn.close()
@@ -84,28 +84,48 @@ def server():
             while True :
                 try :
                     msg = conn.recv(1024).decode()
-                    if msg == 'CPU':
-                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{psutil.cpu_percent()} \n".encode())
-                    elif msg == 'RAM':
-                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{psutil.virtual_memory()[2]} \n".encode())
-                    elif msg == 'IP':
-                        conn.send(f"[{hostname}] \n{IPadress} \n".encode())
+                    if msg.startswith('dos'):
+                        if OperatingSystem == 'Windows':
+                            cmd = msg.split(":")[1]
+                            reply = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850',shell=True)
+                            out, err = reply.communicate()
+                            if reply.returncode == 0:
+                                conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{out} \n".encode())
+                            else :
+                                conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{err} \n".encode())
+                        else :
+                            conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n This command is only available for Windows".encode())
+                    elif msg.startswith('linux'):
+                        if OperatingSystem != 'Windows':
+                            cmd = msg.split(":",1)[1]
+                            reply = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850',shell=True)
+                            out, err = reply.communicate()
+                            if reply.returncode == 0:
+                                conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{out} \n".encode())
+                            else :
+                                conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{err} \n".encode())
+                        else :
+                            conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n This command is only available for Linux type system".encode())
+                    elif msg == 'cpu':
+                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \nThe CPU usage is {psutil.cpu_percent()} % \n".encode())
+                    elif msg == 'ram':
+                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \nThe memory usage is {psutil.virtual_memory()[2]} % \n".encode())
+                    elif msg == 'ip':
+                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \nThe server's IP address is : {IPadress} \n".encode())
                     elif msg == 'hostname':
-                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{hostname} \n".encode())
-                    elif msg == 'OS':
-                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{OperatingSystem} \n".encode())
-                    elif msg == 'DISCONNECT':
+                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \nThe server's hostname is {hostname} \n".encode())
+                    elif msg == 'os':
+                        conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \nThe server's Operating System is {OperatingSystem} \n".encode())
+                    elif msg == 'disconnect':
                         conn.close()
                         print("Connection closed")
                         break
-                    elif msg == 'RESET':
+                    elif msg == 'reset':
                         # disconnect and reconnect to the client
+                        time.sleep(1)
                         conn.close()
-                        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                        serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-                        serversocket.bind((host, port))
-                        print("Connection closed")
-                    elif msg == 'KILL':
+                        break
+                    elif msg == 'kill':
                         conn.close()
                         print("Connection closed")
                         serversocket.close()
@@ -114,7 +134,12 @@ def server():
                     else :
                         try:
                             reply = subprocess.Popen(msg,stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850',shell=True)
-                            conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{reply.stdout.read()}".encode())
+                            if reply.stderr.read() != "":
+                                conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{reply.stderr.read()}".encode())
+                                print(reply.stderr.read())
+                            else :
+                                conn.send(f"[{hostname}] {time.strftime('%H:%M:%S')} \n{reply.stdout.read()}".encode())
+                                print(reply.stdout.read())
                         except:
                             conn.send("Command not found".encode())
                     print (msg)

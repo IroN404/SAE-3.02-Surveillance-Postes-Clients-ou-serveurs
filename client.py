@@ -1,9 +1,9 @@
 # Importation des modules
 from PyQt6 import *
 import csv, sys, socket
-from PyQt6.QtWidgets import *
-from PyQt6.QtGui import *
-from PyQt6.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 import os
 import threading
 import time
@@ -14,9 +14,8 @@ class UI(QWidget):
         # Create the window
         super().__init__()  # Call the QWidget constructor
         self.setWindowTitle("Surveillance poste client")    # Set the title
-        self.setFixedWidth(750) # Set the width of the window
-        self.setFixedHeight(500)    # Set the height of the window
-        self.setStyleSheet("background-color: #131313")    # Set the background color
+          # Set the height of the window
+        self.setStyleSheet("background-color: #2C313C;border: 0px;")    # Set the background color
         # Create the differnt parts of the window
         self.MainFrame = QHBoxLayout() # Create the layout
         self.LeftBar = QVBoxLayout()    # Create the left bar
@@ -33,50 +32,52 @@ class UI(QWidget):
         self.Command = QLineEdit()   # Create the input
         self.ConnectionState = QLabel("Not Connected") # Create the label
         self.EmptyTextBox = QLabel("Server List")
-        global secondlabel
         self.secondlabel = QLabel("Please choose a CSV file with the\nbutton above or start adding a server\nmanually to create a local CSV file")
         # Define Host attributes
         self.Host.setPlaceholderText("Host")
-        self.Host.setStyleSheet("background-color: #000; color: #FFF;")
+        self.Host.setStyleSheet("background-color: #000; color: #FFF;border-radius:5px;")
         self.Host.setFixedWidth(225)
         self.Host.setFixedHeight(30)
         # Define Port attributes
         self.Port.setPlaceholderText("Port")
-        self.Port.setStyleSheet("background-color: #000; color: #FFF;")
+        self.Port.setStyleSheet("background-color: #000; color: #FFF;border-radius:5px;")
         self.Port.setFixedWidth(225)
         self.Port.setFixedHeight(30)
         # Define Response attributes
         self.Response.setReadOnly(True)
         self.Response.setPlaceholderText("Server's reply will be displayed here")
         # Define AddButton attributes
-        self.AddButton.setStyleSheet("background-color: #000; color: #FFF;")
+        self.AddButton.setStyleSheet("background-color: #55AAFF; color: #FFF;padding: 0,0,0,20;border-radius: 10px 10px / 10px;")
+        self.AddButton.setFixedHeight(30)
         # Define ConnectionState attributes
         self.ConnectionState.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.ConnectionState.setStyleSheet("color: #FFF;padding: 20,0,0,0;color: red;")
+        self.ConnectionState.setFont(QFont("Arial", 10))
         self.ConnectionState.setFixedHeight(30)
         # Define ChooseFile attributes
         #self.ChooseFile.setStyleSheet("background-color: #000; color: #FFF;padding: 0,0,0,20;border-top : 1px solid #FFF;")
-        self.ChooseFile.setFixedWidth(250)
+        self.ChooseFile.setStyleSheet("background-color: #55AAFF; color: #FFF;padding: 0,0,0,20;border-radius: 0px 0px 10px 10px;")
         self.ChooseFile.setFixedHeight(30)
         # Define ServerList attributes
-        self.ServerList.setStyleSheet(" background-color: #000; color: #FFF;")
+        self.ServerList.setStyleSheet(" background-color: #1B1D23; color: #FFF;")
+        self.ServerList.setLineWidth(0)
         # Define Respone attributes
-        self.Response.setStyleSheet("background-color: #000; color: #FFF;")
+        self.Response.setStyleSheet("background-color: #272C36; color: #FFF;")
         self.Response.setFixedWidth(500)
         # Define Command attributes
-        self.Command.setStyleSheet("background-color: #000; color: #FFF;border-top : 1px solid #FFF;")
+        self.Command.setStyleSheet("background-color: #272C36; color: #FFF;border-top : 1px solid #FFF;")
         self.Command.setPlaceholderText("Insert a command here : ")
         self.Command.setFixedHeight(30)
         self.Command.setFixedWidth(500)
         # Define EmptyTextBox attributes
         self.EmptyTextBox.setFixedHeight(50)
-        self.EmptyTextBox.setStyleSheet("background-color: #000; color: #FFF;border-bottom : 1px solid #FFF;")
+        self.EmptyTextBox.setStyleSheet("background-color: #1B1D23; color: #FFF;border-bottom : 1px solid #FFF;")
         self.EmptyTextBox.setFont(QFont("Arial", 20))
         self.EmptyTextBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
         # Define secondlabel attributes
-        self.secondlabel.setStyleSheet("background-color: #000; color: #FFF;padding: 20,20,0,0;")
+        self.secondlabel.setStyleSheet("background-color: #1B1D23; color: #FFF;padding: 20,20,0,0;")
         self.secondlabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.secondlabel.setFont(QFont("Arial", 14))
+        self.secondlabel.setFont(QFont("Arial", 10))
         # Server list 
         self.LeftBar.addLayout(self.LeftBarTop) # Add the top part of the left bar to the left bar
         self.LeftBar.addLayout(self.LeftBarBottom)   # Add the bottom part of the left bar to the left bar
@@ -84,13 +85,15 @@ class UI(QWidget):
         self.LeftBarTop.addWidget(self.secondlabel)
         self.LeftBarTop.addWidget(self.ServerList)
         self.LeftBarTop.addWidget(self.ChooseFile)
-        self.LeftBarTop.setContentsMargins(0, 0, 0, 20)
+        self.LeftBarTop.setContentsMargins(30, 25, 50, 25)
+        self.LeftBarTop.setSpacing(0)
         # Server adding side
         self.LeftBarBottom.addWidget(self.Host)
         self.LeftBarBottom.addWidget(self.Port)
         self.LeftBarBottom.addWidget(self.AddButton)
         self.LeftBarBottom.addWidget(self.ConnectionState)
         self.LeftBarBottom.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.LeftBarBottom.setContentsMargins(30, 0, 50, 0)
         self.LeftBarBottom.setSpacing(10)
         # Left Side
         self.LeftBar.setContentsMargins(0, 0, 0, 20)
@@ -111,18 +114,25 @@ class UI(QWidget):
         self.Command.returnPressed.connect(lambda: self.Send())
         self.ServerList.itemDoubleClicked.connect(lambda: self.connect())
         self.file = None
+        self.kill = False
         self.rec = threading.Thread(target=self.Receive)
+
+        
         self.rec.start() # Start the receive thread
         # Display the window
         self.show()
 
+    def Scroll(self):
+        self.Response.verticalScrollBar().setValue(self.Response.verticalScrollBar().maximum())
+
     def Receive(self):
         # wait for the server to send a message
-        while True:
+        while self.kill != True:
             try:
                 self.Response.append(client_socket.recv(1024).decode())
             except:
                 pass
+            self.Scroll()
             
 
     def CSVupdate(self):
@@ -223,6 +233,8 @@ class UI(QWidget):
         global ip
         global port
         global client_socket
+        global current_ip
+        global current_port
         ip = None
         port = None
         client_socket = None
@@ -231,6 +243,8 @@ class UI(QWidget):
         if selected != None:
             ip = selected.text().split(" ")[2]
             port = selected.text().split(" ")[5]
+            current_ip = ip
+            current_port = port
             try :
                 client_socket = socket.socket() # Create a socket
                 client_socket.connect((ip, int(port))) # Connect to the server
@@ -244,17 +258,6 @@ class UI(QWidget):
                 self.Response.append("Connection failed")
         else:
             self.Response.append("Please choose a server")
-    
-    def disconnect(self):   # Disconnect function
-        try:    # Try
-            client_socket.send("disconnect".encode())   # Send the disconnect string encoded to the client socket
-            client_socket.close()   # Close the client socket
-            self.ConnectionState.setText("Disconnected")  # Set the connexion state label to "Déconnecté"
-            self.ConnectionState.setStyleSheet("color: red")    # Set the connexion state label color to red
-            self.Response.append("Disconnected from " + ip + ":" + port)   # Append "Déconnecté de " + self.Host.text() + ":" + self.Port.text() to the response text edit
-        except: # Except
-            self.ConnectionState.setText("Not Connected !")  # Set the connexion state label to "Pas Connecté !"
-            self.ConnectionState.setStyleSheet("color: orange") # Set the connexion state label color to orange
 
     def Send(self):
         try :
@@ -263,6 +266,7 @@ class UI(QWidget):
             elif self.Command.text() != "":
                 if self.Command.text() == "disconnect" or self.Command.text() == "DISCONNECT":
                     self.ConnectionState.setStyleSheet("color: red")
+                    client_socket.send(self.Command.text().encode())
                     self.ConnectionState.setText("Disconnected")
                     self.Response.append("Disconnected from "+ ip+":"+port)
                     client_socket.close()
@@ -278,29 +282,37 @@ class UI(QWidget):
                     self.Command.clear()
                 elif self.Command.text() == "kill":
                     self.Response.append("You killed the server, you monster !")
-                    client_socket.send(self.Command.text().upper().encode())
+                    client_socket.send(self.Command.text().encode())
                     self.ConnectionState.setStyleSheet("color: red")
                     self.ConnectionState.setText("Disconnected")
                     client_socket.close()
                     self.Command.clear()
                 elif self.Command.text() == "reset":
                     self.Response.append("You reset the server, didn't liked it like it was ?")
-                    client_socket.send(self.Command.text().upper().encode())
+                    client_socket.send(self.Command.text().encode())
                     self.Command.clear()
+                    self.Response.append("Trying to reconnect to the server" + ip + " on port " + str(current_port))
+                    while True :
+                        try:
+                            client_socket.connect((ip, current_port))
+                            self.Response.append("Reconnected")
+                            break
+                        except:
+                            pass
                 else :
-                    client_socket.send(self.Command.text().upper().encode())
+                    client_socket.send(self.Command.text().encode())
                     self.Command.clear()
         except :
             self.Response.append("Not connected to a server")
 
-    def Quit(self):
-        try :
-            socket.close()
-            self.close()
-            self.rec.stop()
-        except :
-            self.close()    # Close the window
-        
+    def closeEvent(self, event):
+        reply = QMessageBox.question(self, 'Message', "Are you sure to quit ?", 
+                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            event.accept()
+            self.kill = True
+        else:
+            event.ignore()
         
 
 
