@@ -1,4 +1,4 @@
-import socket, platform, psutil, sys, subprocess, signal, time
+import socket, platform, psutil, sys, subprocess, signal, time,os
 
 def handler(signum, frame):
     res = input("Are you sure you want to exit ? (y/n) : ")
@@ -122,8 +122,11 @@ def server():
                         break
                     elif msg == 'reset':
                         # disconnect and reconnect to the client
-                        time.sleep(1)
                         conn.close()
+                        print("Connection closed")
+                        print("Server is restarting...")
+                        time.sleep(1)
+                        print("Server restarted")
                         break
                     elif msg == 'kill':
                         conn.close()

@@ -5,8 +5,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import os
-import threading
-import time
+import threading, time
 
 # Create the application
 class UI(QWidget):
@@ -121,6 +120,20 @@ class UI(QWidget):
         self.rec.start() # Start the receive thread
         # Display the window
         self.show()
+
+    def Reconnect(self):
+        exit = False
+        while exit != True:
+            self.Response.append("Trying to reconnect...")
+            try :
+                client_socket = socket.socket()
+                client_socket.connect((ip, port))
+                self.Response.append("Reconnected")
+                exit = True
+            except:
+                self.Response.append("Failed to reconnect")
+                time.sleep(0,5)
+
 
     def Scroll(self):
         self.Response.verticalScrollBar().setValue(self.Response.verticalScrollBar().maximum())
@@ -288,17 +301,15 @@ class UI(QWidget):
                     client_socket.close()
                     self.Command.clear()
                 elif self.Command.text() == "reset":
-                    self.Response.append("You reset the server, didn't liked it like it was ?")
                     client_socket.send(self.Command.text().encode())
+                    self.Response.append("You reset the server, didn't liked it like it was ?")
                     self.Command.clear()
                     self.Response.append("Trying to reconnect to the server" + ip + " on port " + str(current_port))
-                    while True :
-                        try:
-                            client_socket.connect((ip, current_port))
-                            self.Response.append("Reconnected")
-                            break
-                        except:
-                            pass
+                    client_socket.close()
+                    self.Response.append("Server reseted")
+                    self.ConnectionState.setText("Not Connected !")
+                    self.ConnectionState.setStyleSheet("color: red")
+                    self.Reconnect()
                 else :
                     client_socket.send(self.Command.text().encode())
                     self.Command.clear()
