@@ -150,6 +150,11 @@ def server():
                         serversocket.close()
                         print("Server closed")
                         sys.exit()
+                    # Uncomment the code below if you want to add more commands, you can also add more command by copying the elif line and pasting it below the last elif line and changing the command and the message.
+                        """
+                    elif msg == '<enter the command>':
+                        conn.send(f"[{hostname}] {msg} {time.strftime('%H:%M:%S')} \n""message""\n".encode())
+                        """
                     else :
                         try:
                             reply = subprocess.Popen(msg,stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850',shell=True)

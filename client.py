@@ -29,6 +29,9 @@ class UI(QWidget):
         self.ConnectionState = QLabel("Not Connected") # Create the label
         self.EmptyTextBox = QLabel("Server List")
         self.secondlabel = QLabel("Please choose a CSV file with the\nbutton above or start adding a server\nmanually to create a local CSV file")
+        """
+        self.<name> = <type>()
+        """
         # Define Host attributes
         self.Host.setPlaceholderText("Host")
         self.Host.setStyleSheet("background-color: #000; color: #FFF;border-radius:5px;")
@@ -74,6 +77,10 @@ class UI(QWidget):
         self.secondlabel.setStyleSheet("background-color: #1B1D23; color: #FFF;padding: 20,20,0,0;")
         self.secondlabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.secondlabel.setFont(QFont("Arial", 10))
+        # Define Attributes of a new Widgets
+        """
+        self.<name>.set<Attribute>(<value>)
+         """
         # Server list 
         self.LeftBar.addLayout(self.LeftBarTop) # Add the top part of the left bar to the left bar
         self.LeftBar.addLayout(self.LeftBarBottom)   # Add the bottom part of the left bar to the left bar
@@ -99,6 +106,9 @@ class UI(QWidget):
         self.RightBar.addWidget(self.Command)
         self.RightBar.setContentsMargins(0, 0, 0, 0)
         self.RightBar.setSpacing(0)
+        """
+        self.<wanted layout>.add<Widget>(self.<name>)
+        """
         # Main Frame
         self.MainFrame.setContentsMargins(0, 0, 0, 0)
         self.MainFrame.addLayout(self.LeftBar)
@@ -113,8 +123,10 @@ class UI(QWidget):
         self.kill = False
         self.rec = threading.Thread(target=self.Receive)
         self.rec.start()
-        
-        
+        """
+        self.<name> = <value>
+        self.<name>.<action>(lambda: <function>)
+        """
         # Display the window
         self.show()
 
@@ -243,7 +255,7 @@ class UI(QWidget):
         client_socket = None
         socket.setdefaulttimeout(0.25) # Set the socket timeout to 0.25 second
         selected = self.ServerList.currentItem()
-        if selected != None:
+        if selected != None: 
             ip = selected.text().split(" ")[2]
             port = selected.text().split(" ")[5]
             try :
@@ -318,6 +330,11 @@ class UI(QWidget):
                         self.Response.append("Reconnection failed")
                         self.ConnectionState.setStyleSheet("color: red")
                         self.ConnectionState.setText("Disconnected")
+                # Uncomment the following lines if you want to add a command
+                    """
+                elif self.Command.text() == "command":
+                    client_socket.send(self.Command.text().encode())
+                    """
                 else :
                     client_socket.send(self.Command.text().encode())
                     self.Command.clear()
