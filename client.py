@@ -109,7 +109,7 @@ class UI(QWidget):
         self.AddButton.clicked.connect(lambda: self.AddServer())
         self.Command.returnPressed.connect(lambda: self.Send())
         self.ServerList.itemDoubleClicked.connect(lambda: self.connect())
-        self.file = None
+        self.file = "local"
         self.kill = False
         self.rec = threading.Thread(target=self.Receive)
         self.rec.start()
@@ -119,26 +119,14 @@ class UI(QWidget):
         self.show()
 
     def Reconnect(self):
-        exit = False
-        global client_socket
-        i = 0
-        print(ip + port)
-        while exit != True or i < 5:
-            time.sleep(1)
-            i += 1
-            try :
-                client_socket = socket.socket()
-                self.Response.append("Trying to reconnect...")
-                client_socket.connect((ip, int(port)))
-                exit = True
-                self.Response.append("Reconnected to " + ip + " on port " + port)
-            except:
-                self.Response.append("Failed to reconnect")
-        if i == 5:
-            self.Response.append("Failed to reconnect to the server")
-            self.ConnectionState.setText("Disconnected")
-            self.ConnectionState.setStyleSheet("background-color: #FF5555; color: #FFF;padding: 0,0,0,20;border-top : 1px solid #FFF;")
-
+        time.sleep(1)
+        try :
+            client_socket = socket.socket()
+            client_socket.connect((ip, int(port)))
+            self.Response.append("Reconnected to " + ip + " on port " + port)
+        except:
+            self.Response.append("Failed to reconnect")
+        self.Scroll()
 
     def Scroll(self):
         self.Response.verticalScrollBar().setValue(self.Response.verticalScrollBar().maximum())
@@ -163,10 +151,9 @@ class UI(QWidget):
                     port = column[0].split(";")
                     self.ServerList.addItem("Address : " + ip[0] + " Port : " + port[1])
                     self.secondlabel.setText("Choose a server from the list above")
-                    self.file = True
         elif self.file == "local":
             self.ServerList.clear()
-            with open("SAE 3.02/ServerList.csv", "r") as f:
+            with open("./ServerList.csv", "r") as f:
                 reader = csv.reader(f)
                 for column in reader:
                     ip = column[0].split(";")
@@ -202,13 +189,13 @@ class UI(QWidget):
             else :
                 self.Response.append("Server added to existing file")
                 with open(ServerFileList[0], "a") as f:
-                    # Write an new line in the CSV file
+                    # Write a new line in the CSV file
                         # if f is empty, write the first line
                     if os.stat(ServerFileList[0]).st_size == 0:
                         f.write(self.Host.text() + ";" + self.Port.text())
                     else:
                         f.write("\n" + self.Host.text() + ";" + self.Port.text())
-            self.CSVupdate()
+                self.CSVupdate()
 
         elif self.file == "local":
             if self.Host.text() == "" or self.Port.text() == "" or self.Port.text().isdigit() == False:
@@ -219,14 +206,14 @@ class UI(QWidget):
                 self.Response.append("Port must be between 0 and 65535")
             else :
                 self.Response.append("Server added")
-                with open("SAE 3.02/ServerList.csv", "a") as f:
+                with open("./ServerList.csv", "a") as f:
                     # Write an new line in the CSV file
                         # if f is empty, write the first line
-                        if os.stat("SAE 3.02/ServerList.csv").st_size == 0:
-                            f.write(self.Host.text() + ";" + self.Port.text())
-                        else:
-                            f.write("\n" + self.Host.text() + ";" + self.Port.text())
-            self.CSVupdate()
+                    if os.stat("./ServerList.csv").st_size == 0:
+                        f.write(self.Host.text() + ";" + self.Port.text())
+                    else:
+                        f.write("\n" + self.Host.text() + ";" + self.Port.text())
+                self.CSVupdate()
 
         else:
             if self.Host.text() == "" or self.Port.text() == "":
@@ -237,10 +224,10 @@ class UI(QWidget):
                 self.Response.append("Port must be between 0 and 65535")
             else :
                 self.Response.append("Server added")
-                with open("SAE 3.02/ServerList.csv", "w") as f:
+                with open("./ServerList.csv", "w") as f:
                     # Write an new line in the CSV file
                         # if f is empty, write the first line
-                        if os.stat("SAE 3.02/ServerList.csv").st_size == 0:
+                        if os.stat("./ServerList.csv").st_size == 0:
                             f.write(self.Host.text() + ";" + self.Port.text())
                         else:
                             f.write("\n" + self.Host.text() + ";" + self.Port.text())
@@ -317,7 +304,20 @@ class UI(QWidget):
                     self.Response.append("Server reset")
                     self.Command.clear()
                     client_socket.close()
-                    self.Reconnect()
+                    i = 0
+                    while i < 3:
+                        try:
+                            self.Response.append("Trying to reconnect ...")
+                            time.sleep(2)
+                            self.connect()
+                            break
+                        except:
+                            pass
+                        i += 1
+                    if i == 3:
+                        self.Response.append("Reconnection failed")
+                        self.ConnectionState.setStyleSheet("color: red")
+                        self.ConnectionState.setText("Disconnected")
                 else :
                     client_socket.send(self.Command.text().encode())
                     self.Command.clear()

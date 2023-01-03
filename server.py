@@ -142,8 +142,6 @@ def server():
                         # disconnect and reconnect to the client
                         conn.close()
                         print("Connection closed")
-                        print("Server is restarting...")
-                        time.sleep(1)
                         print("Server restarted")
                         break
                     elif msg == 'kill':
