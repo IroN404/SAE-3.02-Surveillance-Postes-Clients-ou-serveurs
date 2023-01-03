@@ -31,6 +31,7 @@
 - psutil
 - socket
 - threading
+- PyQt5
 
 ## Installation
 - Install python 3.x
@@ -88,11 +89,11 @@ After that, you can choose a server to connect to in the list, and connect to it
 
 You can add a server to the list by enterings the correpondings information in the fields above the list, then you can click on the "Add" button to add the new server to the list.
 
-<a href="https://ibb.co/9wX3ZVT"><img src="https://i.ibb.co/vs5vXQP/Capture-d-cran-2022-12-30-13-42-59.png" alt="Capture-d-cran-2022-12-30-13-42-59" border="0" width="200" height="400"></a>
+<a href="https://ibb.co/kKZ1Jxw"><img src="https://i.ibb.co/v19YhHT/Capture-d-cran-2023-01-03-08-48-06.png" alt="Capture-d-cran-2023-01-03-08-48-06" border="0" width="200" height="400"></a>
 
 Once connected, you can send a command to the server by entering it in the "Command" field and pressing enter key.
 
-<a href="https://ibb.co/QP9HVQX"><img src="https://i.ibb.co/F56Y13n/Capture-d-cran-2022-12-30-13-51-16.png" alt="Capture-d-cran-2022-12-30-13-51-16" border="0" width="400" hieght="700"></a>
+<a href="https://ibb.co/TBn6W2K"><img src="https://i.ibb.co/xScWFLm/Capture-d-cran-2023-01-03-08-50-18.png" alt="Capture-d-cran-2023-01-03-08-50-18" border="0" width="400" height="400"></a>
 
 #### Here is a list of the  predifined commands that can be sent to the server:
 
@@ -108,14 +109,24 @@ Once connected, you can send a command to the server by entering it in the "Comm
 | ping <address> | Ping the server |
 | clear   | Clear the terminal |
 | disconnect | Disconnect from the server |
-| connexion information | Retrieve the server's ip and name |
+| connection information | Retrieve the server's ip and name |
 | kill   | Kill the server |
 | reset  | Reset the server |
 | exit    | Disconnect from the server |
 
 #### There are commands specific to the os of the server:
 
-##### For windows:
+In case of an incorrect command, the server will return an error message to the client containing the specific error.
+The commons errors are:
+
+| Error | Description |
+| ----- | ----------- |
+| Command not found | The command is not recognized by the server |
+| This command is only available on <os> | The command is only available on a specific os |
+| Server is not connected | The server is not connected to the client |
+| Server is not responding | The server is not responding to the client |
+
+##### For windows (Some examples)):
 
 | Command | Description |
 | ------- | ----------- |
@@ -127,7 +138,7 @@ Once connected, you can send a command to the server by entering it in the "Comm
 | powershell: get-process | Retrieve the list of processes running on the server |
 | powershell: stop-process <process name> | Stop a process running on the server |
 
-##### For linux:
+##### For linux (Some examples)):
 
 | Command | Description |
 | ------- | ----------- |
