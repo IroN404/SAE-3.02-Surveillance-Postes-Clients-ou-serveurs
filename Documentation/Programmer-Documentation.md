@@ -14,7 +14,7 @@
     <a href="#App">Add a new feature to the GUI</a>
 </p>
 
-#
+
 
 <h3 align="center">Project Presentation</h3>
 
@@ -27,7 +27,6 @@ This project is a Python based GUI app made with PyQt to monitor a server's reso
 
 <h3 align="center">How to add a new feature to the app</h3>
 
-#
 #
 
 
