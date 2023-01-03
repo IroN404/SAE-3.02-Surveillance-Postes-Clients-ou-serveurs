@@ -116,6 +116,24 @@ def server():
                         conn.send(f"[{hostname}] {msg} {time.strftime('%H:%M:%S')} \nThe server's hostname is {hostname} \n".encode())
                     elif msg == 'os':
                         conn.send(f"[{hostname}] {msg} {time.strftime('%H:%M:%S')} \nThe server's Operating System is {OperatingSystem} \n".encode())
+                    elif msg.startswith('ping'):
+                        cmd = msg
+                        if OperatingSystem == 'Windows':
+                            reply = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850',shell=True)
+                            out, err = reply.communicate()
+                            if reply.returncode == 0:
+                                conn.send(f"[{hostname}] {cmd} {time.strftime('%H:%M:%S')} \n{out} \n".encode())
+                            else :
+                                conn.send(f"[{hostname}] {cmd} {time.strftime('%H:%M:%S')} \n{err} \n".encode())
+                        else :
+                            cmd = cmd + " -c 4"
+                            reply = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='cp850',shell=True)
+                            out, err = reply.communicate()
+                            if reply.returncode == 0:
+                                conn.send(f"[{hostname}] {cmd} {time.strftime('%H:%M:%S')} \n{out} \n".encode())
+                            else :
+                                conn.send(f"[{hostname}] {cmd} {time.strftime('%H:%M:%S')} \n{err} \n".encode())
+                            
                     elif msg == 'disconnect':
                         conn.close()
                         print("Connection closed")

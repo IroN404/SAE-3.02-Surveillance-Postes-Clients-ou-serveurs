@@ -1,11 +1,8 @@
 # Importation des modules
-from PyQt6 import *
-import csv, sys, socket
+import csv, sys, socket, os, threading, time
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-import os
-import threading, time
 
 # Create the application
 class UI(QWidget):
@@ -115,24 +112,32 @@ class UI(QWidget):
         self.file = None
         self.kill = False
         self.rec = threading.Thread(target=self.Receive)
-
+        self.rec.start()
         
-        self.rec.start() # Start the receive thread
+        
         # Display the window
         self.show()
 
     def Reconnect(self):
         exit = False
-        while exit != True:
-            self.Response.append("Trying to reconnect...")
+        global client_socket
+        i = 0
+        print(ip + port)
+        while exit != True or i < 5:
+            time.sleep(1)
+            i += 1
             try :
                 client_socket = socket.socket()
-                client_socket.connect((ip, port))
-                self.Response.append("Reconnected")
+                self.Response.append("Trying to reconnect...")
+                client_socket.connect((ip, int(port)))
                 exit = True
+                self.Response.append("Reconnected to " + ip + " on port " + port)
             except:
                 self.Response.append("Failed to reconnect")
-                time.sleep(0,5)
+        if i == 5:
+            self.Response.append("Failed to reconnect to the server")
+            self.ConnectionState.setText("Disconnected")
+            self.ConnectionState.setStyleSheet("background-color: #FF5555; color: #FFF;padding: 0,0,0,20;border-top : 1px solid #FFF;")
 
 
     def Scroll(self):
@@ -246,8 +251,6 @@ class UI(QWidget):
         global ip
         global port
         global client_socket
-        global current_ip
-        global current_port
         ip = None
         port = None
         client_socket = None
@@ -256,8 +259,6 @@ class UI(QWidget):
         if selected != None:
             ip = selected.text().split(" ")[2]
             port = selected.text().split(" ")[5]
-            current_ip = ip
-            current_port = port
             try :
                 client_socket = socket.socket() # Create a socket
                 client_socket.connect((ip, int(port))) # Connect to the server
@@ -305,7 +306,7 @@ class UI(QWidget):
                     self.Response.append("Linux command --> linux:<command> : execute a linux command")
                     self.Command.clear()
                 elif self.Command.text() == "kill":
-                    self.Response.append("You killed the server, you monster !")
+                    self.Response.append("The server has been killed")
                     client_socket.send(self.Command.text().encode())
                     self.ConnectionState.setStyleSheet("color: red")
                     self.ConnectionState.setText("Disconnected")
@@ -313,13 +314,9 @@ class UI(QWidget):
                     self.Command.clear()
                 elif self.Command.text() == "reset":
                     client_socket.send(self.Command.text().encode())
-                    self.Response.append("You reset the server, didn't liked it like it was ?")
+                    self.Response.append("Server reset")
                     self.Command.clear()
-                    self.Response.append("Trying to reconnect to the server" + ip + " on port " + str(current_port))
                     client_socket.close()
-                    self.Response.append("Server reseted")
-                    self.ConnectionState.setText("Not Connected !")
-                    self.ConnectionState.setStyleSheet("color: red")
                     self.Reconnect()
                 else :
                     client_socket.send(self.Command.text().encode())
